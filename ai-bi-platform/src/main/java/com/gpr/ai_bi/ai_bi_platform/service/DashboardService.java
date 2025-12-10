@@ -2,7 +2,7 @@ package com.gpr.ai_bi.ai_bi_platform.service;
 
 import org.springframework.stereotype.Service;
 import com.gpr.ai_bi.ai_bi_platform.repository.SalesRepository;
-
+import com.gpr.ai_bi.ai_bi_platform.model.DashboardSummary;
 
 @Service
 public class DashboardService {

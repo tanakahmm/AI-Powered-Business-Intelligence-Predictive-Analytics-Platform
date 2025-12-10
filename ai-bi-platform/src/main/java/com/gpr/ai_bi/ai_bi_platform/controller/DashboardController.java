@@ -20,3 +20,4 @@ public class DashboardController {
     public DashboardSummary getSummary() {
         return dashboardService.getSummary();
 }
+}
