@@ -9,7 +9,7 @@ public interface SalesRepository extends JpaRepository<Sales, Long> {
 
     @Query("SELECT SUM(s.profit) FROM Sales s")
     Double getTotalProfit();
-
+ 
     @Query("SELECT COUNT(DISTINCT s.region) FROM Sales s")
     Long getRegionCount();
 }
