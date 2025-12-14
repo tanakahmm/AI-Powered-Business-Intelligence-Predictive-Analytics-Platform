@@ -1,26 +1,19 @@
 package com.gpr.ai_bi.ai_bi_platform.service;
 
 import org.springframework.stereotype.Service;
-import com.gpr.ai_bi.ai_bi_platform.repository.SalesRepository;
 import com.gpr.ai_bi.ai_bi_platform.model.DashboardSummary;
 
 @Service
 public class DashboardService {
-    private final SalesRepository salesRepository;
-
-    public DashboardService(SalesRepository salesRepository) {
-        this.salesRepository = salesRepository;
-    }
 
     public DashboardSummary getSummary() {
-        Double totalRevenue = salesRepository.getTotalRevenue();
-        Double totalProfit = salesRepository.getTotalProfit();
-        Long regionCount = salesRepository.getRegionCount();
-
+        // Return demo data for now
+        // TODO: Replace with actual database queries when data is available
         DashboardSummary summary = new DashboardSummary();
-        summary.setTotalRevenue(totalRevenue != null ? totalRevenue : 0.0);
-        summary.setTotalProfit(totalProfit != null ? totalProfit : 0.0);
-        summary.setRegionCount(regionCount != null ? regionCount : 0L);
+        summary.setRevenue("₹48,20,000");
+        summary.setProfit("₹12,45,000");
+        summary.setCustomers(1920);
+        summary.setGrowth("21.4%");
         return summary;
     }
 }
