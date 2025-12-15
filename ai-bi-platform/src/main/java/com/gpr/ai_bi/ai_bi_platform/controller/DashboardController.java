@@ -1,9 +1,12 @@
 package com.gpr.ai_bi.ai_bi_platform.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
-import com.gpr.ai_bi.ai_bi_platform.model.DashboardSummary;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.gpr.ai_bi.ai_bi_platform.service.DashboardService;
 
 @RestController
@@ -17,7 +20,13 @@ public class DashboardController {
     }
 
     @GetMapping("/summary")
-    public DashboardSummary getSummary() {
-        return dashboardService.getSummary();
-}
+    public Map<String, Object> getSummary() {
+        return dashboardService.getDashboardSummary();
+    }
+
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @GetMapping("/metrics")
+    public Map<String, Object> getMetrics() {
+        return dashboardService.getMetrics();
+    }
 }

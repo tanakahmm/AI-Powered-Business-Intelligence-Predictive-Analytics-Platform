@@ -3,6 +3,7 @@ package com.gpr.ai_bi.ai_bi_platform.service;
 import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 import org.springframework.stereotype.Service;
+
 @Service
 public class ChurnService {
     private final RestTemplate restTemplate;
@@ -12,13 +13,36 @@ public class ChurnService {
     }
 
     public Map<String, Object> predictChurn(Map<String, Object> input) {
-
         String pythonUrl = "http://localhost:8000/predict-churn";
 
-        // Send request to Python AI service
-        Map<String, Object> response =
-                restTemplate.postForObject(pythonUrl, input, Map.class);
+        try {
+            // Send request to Python AI service
+            return restTemplate.postForObject(pythonUrl, input, Map.class);
+        } catch (Exception e) {
+            // Fallback: Return mock prediction
+            // Fallback: Smart Mock based on rudimentary logic
+            int complaints = 0;
+            if (input.containsKey("complaints")) {
+                try {
+                    complaints = Integer.parseInt(input.get("complaints").toString());
+                } catch (NumberFormatException ex) {
+                }
+            }
 
-        return response;
+            double probability = 0.10 + (complaints * 0.15); // Increase risk with complaints
+            if (probability > 0.95)
+                probability = 0.95;
+
+            String risk = "LOW";
+            if (probability > 0.4)
+                risk = "MEDIUM";
+            if (probability > 0.7)
+                risk = "HIGH";
+
+            return Map.of(
+                    "churn_probability", probability,
+                    "risk_level", risk,
+                    "message", "Generated from fallback (AI service unavailable - Smart Mock)");
+        }
     }
 }

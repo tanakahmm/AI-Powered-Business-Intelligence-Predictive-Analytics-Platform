@@ -1,24 +1,41 @@
 package com.gpr.ai_bi.ai_bi_platform.controller;
 
-import java.util.HashMap;
+import com.gpr.ai_bi.ai_bi_platform.entity.SalesForecast;
+import com.gpr.ai_bi.ai_bi_platform.service.ForecastService;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/forecast")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class ForecastController {
+
+    private final ForecastService forecastService;
+
+    public ForecastController(ForecastService forecastService) {
+        this.forecastService = forecastService;
+    }
+
     @GetMapping("/predict")
-    public Map<String, Object> forecast(@RequestParam(defaultValue = "3") int months) {
-        Map<String, Object> res = new HashMap<>();
-        res.put("predicted_sales", List.of(720000.0, 740000.0, 760000.0));
-        res.put("trend", "UPWARD");
-        return res;
+    public Map<String, Object> forecast(@RequestParam(defaultValue = "3") int months,
+            @RequestParam(defaultValue = "STABLE") String trend) {
+        return forecastService.getForecast(months, trend);
+    }
+
+    @PostMapping
+    public SalesForecast createForecast(@RequestBody SalesForecast forecast) {
+        return forecastService.createForecast(forecast);
+    }
+
+    @GetMapping
+    public java.util.List<SalesForecast> getAllForecasts() {
+        return forecastService.getAllForecasts();
+    }
+
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public void deleteForecast(@PathVariable Long id) {
+        forecastService.deleteForecast(id);
     }
 }
