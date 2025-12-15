@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { placeOrder, getProducts } from '../services/api';
 
 export default function PlaceOrderScreen({ navigation }) {
-    const [customerId, setCustomerId] = useState('');
     const [productId, setProductId] = useState(null);
     const [quantity, setQuantity] = useState('');
     const [loading, setLoading] = useState(false);
@@ -14,18 +13,6 @@ export default function PlaceOrderScreen({ navigation }) {
     useEffect(() => {
         const initialize = async () => {
             try {
-                // Get Customer ID
-                const userInfoStr = await AsyncStorage.getItem('userInfo');
-                if (userInfoStr) {
-                    const userInfo = JSON.parse(userInfoStr);
-                    if (userInfo.customerId) {
-                        setCustomerId(userInfo.customerId.toString());
-                    } else {
-                        // Fallback if no customer ID (e.g. old admin login)
-                        setCustomerId("1");
-                    }
-                }
-
                 // Get Products
                 const productList = await getProducts();
                 setProducts(productList);
@@ -40,7 +27,7 @@ export default function PlaceOrderScreen({ navigation }) {
     }, []);
 
     const handlePlaceOrder = async () => {
-        if (!customerId || !productId || !quantity) {
+        if (!productId || !quantity) {
             Alert.alert("Error", "Please select a product and enter quantity");
             return;
         }
@@ -48,7 +35,7 @@ export default function PlaceOrderScreen({ navigation }) {
         setLoading(true);
         try {
             const orderData = {
-                customer: { customerId: parseInt(customerId) },
+                // Backend knows the customer from the Auth Token
                 product: { productId: parseInt(productId) },
                 quantity: parseInt(quantity)
             };
@@ -67,13 +54,6 @@ export default function PlaceOrderScreen({ navigation }) {
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Text style={styles.header}>Place New Order</Text>
-
-                <Text style={styles.label}>Customer ID (Auto-filled)</Text>
-                <TextInput
-                    style={[styles.input, styles.disabledInput]}
-                    value={customerId}
-                    editable={false}
-                />
 
                 <Text style={styles.label}>Select Product</Text>
                 {fetchingProducts ? (

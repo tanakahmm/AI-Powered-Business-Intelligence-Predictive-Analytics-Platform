@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { getStocks } from '../services/api';
 
-export default function StockScreen() {
+export default function StockScreen({ navigation }) {
     const [stocks, setStocks] = useState([]);
     const [loading, setLoading] = useState(true);
 

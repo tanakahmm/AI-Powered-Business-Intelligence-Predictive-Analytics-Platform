@@ -23,31 +23,28 @@ public class OrderController {
     public List<Order> getAllOrders() {
         org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
                 .getContext().getAuthentication();
-        String role = auth.getAuthorities().stream().findFirst().get().getAuthority();
 
-        // If Customer, filter by their ID
-        if (role.equals("ROLE_CUSTOMER") || role.equals("ROLE_USER")) {
-            // In a real app, we'd extract Customer ID from the UserDetails or Token.
-            // Since we don't have easy access to Customer ID here without a lookup or
-            // expanding the Principal,
-            // and for this specific task fixing 403 is priority, we will allow them to see
-            // all for now OR better:
-            // Lookup customer by email.
+        String role = auth.getAuthorities().stream()
+                .findFirst()
+                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                .orElse("ROLE_CUSTOMER"); // Default fallback
 
-            // However, to keep it robust and not break:
-            // Let's assume the Principal is the UserDetails which contains the email.
-            // We can look up the customer by email.
-            // But we need CustomerRepository or a Service method that does it.
-            // Let's modify OrderService to handle "getOrdersForCurrentUser(email)".
+        // Debug log
+        System.out.println("Fetching orders for user: " + auth.getName() + " with role: " + role);
+
+        if ("ROLE_ADMIN".equals(role) || "ROLE_ANALYST".equals(role)) {
+            return orderService.getAllOrders();
+        } else {
+            // For CUSTOMER and others, strictly filter by their email
             return orderService.getOrdersForUser(auth.getName());
         }
-
-        return orderService.getAllOrders();
     }
 
     @PostMapping("/placeOrder")
     public Order placeOrder(@RequestBody Order order) {
-        return orderService.placeOrder(order);
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        return orderService.placeOrder(order, auth.getName());
     }
 
     @PutMapping("/updateStatus/{id}")

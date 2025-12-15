@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, Switch, ScrollView, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BASE_URL } from '../services/api';
-// Note: We need to export BASE_URL from api.js or create a createProduct function. 
-// For now, I'll assume we add createProduct to api.js or use fetch directly.
+import { createProduct } from '../services/api';
 
 export default function ProductFormScreen({ navigation }) {
     const [name, setName] = useState('');
     const [category, setCategory] = useState('');
+    const [initialStock, setInitialStock] = useState('');
     const [costPrice, setCostPrice] = useState('');
     const [sellingPrice, setSellingPrice] = useState('');
     const [active, setActive] = useState(true);
     const [loading, setLoading] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const checkRole = async () => {
             const userInfoStr = await AsyncStorage.getItem('userInfo');
             if (userInfoStr) {
                 const userInfo = JSON.parse(userInfoStr);
+                // Allow both ADMIN and ANALYST to create products if needed, or strictly ADMIN
                 if (userInfo.role !== 'ADMIN') {
                     Alert.alert("Access Denied", "Only Admins can create products.");
                     navigation.goBack();
@@ -35,34 +35,21 @@ export default function ProductFormScreen({ navigation }) {
 
         setLoading(true);
         try {
-            const token = await AsyncStorage.getItem('userToken');
             const productData = {
                 name,
                 category,
+                initialStock: parseInt(initialStock) || 0,
                 costPrice: parseFloat(costPrice),
                 sellingPrice: parseFloat(sellingPrice),
                 active
             };
 
-            const response = await fetch(`${BASE_URL}/products`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(productData)
-            });
-
-            if (response.ok) {
-                Alert.alert("Success", "Product Created!");
-                navigation.goBack();
-            } else {
-                const errorText = await response.text();
-                throw new Error(errorText || "Failed to create product");
-            }
+            await createProduct(productData);
+            Alert.alert("Success", "Product Created!");
+            navigation.goBack();
         } catch (error) {
             console.error("Create Product Error:", error);
-            Alert.alert("Error", "Failed to create product");
+            Alert.alert("Error", error.message || "Failed to create product");
         } finally {
             setLoading(false);
         }
@@ -76,6 +63,9 @@ export default function ProductFormScreen({ navigation }) {
 
                 <Text style={styles.label}>Category</Text>
                 <TextInput style={styles.input} value={category} onChangeText={setCategory} placeholder="e.g. Electronics" />
+
+                <Text style={styles.label}>Initial Stock</Text>
+                <TextInput style={styles.input} value={initialStock} onChangeText={setInitialStock} placeholder="0" keyboardType="numeric" />
 
                 <Text style={styles.label}>Cost Price</Text>
                 <TextInput style={styles.input} value={costPrice} onChangeText={setCostPrice} placeholder="0.00" keyboardType="numeric" />

@@ -83,9 +83,6 @@ export default function HomeScreen({ navigation }) {
           {/* CUSTOMER VIEW: Stock, My Orders, New Order, Notifications, Settings */}
           {role === 'CUSTOMER' && (
             <>
-              <TouchableOpacity style={[styles.navCard, { backgroundColor: '#4CAF50' }]} onPress={() => navigation.navigate("Stock")}>
-                <Text style={styles.navText}>📦 Inventory</Text>
-              </TouchableOpacity>
               <TouchableOpacity style={[styles.navCard, { backgroundColor: '#2196F3' }]} onPress={() => navigation.navigate("Orders")}>
                 <Text style={styles.navText}>🛒 My Orders</Text>
               </TouchableOpacity>

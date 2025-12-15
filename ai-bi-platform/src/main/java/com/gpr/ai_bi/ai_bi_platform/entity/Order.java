@@ -1,13 +1,18 @@
 package com.gpr.ai_bi.ai_bi_platform.entity;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,11 +27,8 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    private int quantity;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> items;
     private LocalDate orderDate;
     private String status;
 
@@ -46,20 +48,12 @@ public class Order {
         this.customer = customer;
     }
 
-    public Product getProduct() {
-        return product;
+    public List<OrderItem> getItems() {
+        return items;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
     }
 
     public LocalDate getOrderDate() {

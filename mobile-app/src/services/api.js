@@ -149,6 +149,19 @@ export const getReports = async () => {
 
 // --- Product API ---
 
+export const createProduct = async (productData) => {
+  try {
+    return await fetchWithTimeout(`${BASE_URL}/products`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(productData)
+    });
+  } catch (error) {
+    console.error("Create Product API Error:", error);
+    throw new Error("Failed to create product.");
+  }
+};
+
 export const getProducts = async () => {
   try {
     return await fetchWithTimeout(`${BASE_URL}/products`);
