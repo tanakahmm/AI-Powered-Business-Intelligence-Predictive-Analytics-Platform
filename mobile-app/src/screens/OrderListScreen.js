@@ -52,6 +52,12 @@ export default function OrderListScreen() {
                         )}
                     </View>
                 )}
+                ListEmptyComponent={
+                    <View style={styles.center}>
+                        <Text style={styles.emptyText}>No orders yet</Text>
+                        <Text style={styles.subText}>Your order history will appear here.</Text>
+                    </View>
+                }
             />
         </View>
     );

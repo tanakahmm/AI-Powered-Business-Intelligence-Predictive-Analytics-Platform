@@ -22,16 +22,19 @@ public class DashboardService {
         private final OrderRepository orderRepository;
         private final ProductRepository productRepository;
         private final SaleRepository saleRepository;
+        private final com.gpr.ai_bi.ai_bi_platform.repository.KpiSnapshotRepository kpiSnapshotRepository;
 
         public DashboardService(
                         CustomerRepository customerRepository,
                         OrderRepository orderRepository,
                         ProductRepository productRepository,
-                        SaleRepository saleRepository) {
+                        SaleRepository saleRepository,
+                        com.gpr.ai_bi.ai_bi_platform.repository.KpiSnapshotRepository kpiSnapshotRepository) {
                 this.customerRepository = customerRepository;
                 this.orderRepository = orderRepository;
                 this.productRepository = productRepository;
                 this.saleRepository = saleRepository;
+                this.kpiSnapshotRepository = kpiSnapshotRepository;
         }
 
         public Map<String, Object> getDashboardSummary() {
@@ -175,5 +178,38 @@ public class DashboardService {
                 metrics.put("monthlyGrowth", monthlyGrowth);
 
                 return metrics;
+        }
+
+        @org.springframework.transaction.annotation.Transactional
+        public void captureDailySnapshot() {
+                // Calculate daily totals
+                BigDecimal totalRevenue = saleRepository.findAll().stream()
+                                .map(Sale::getRevenue)
+                                .filter(r -> r != null)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal totalProfit = saleRepository.findAll().stream()
+                                .map(Sale::getProfit)
+                                .filter(p -> p != null)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                long activeCustomers = customerRepository.findAll().stream()
+                                .filter(c -> "ACTIVE".equals(c.getStatus()))
+                                .count();
+
+                long totalOrders = orderRepository.count();
+
+                // Check if snapshot exists for today
+                com.gpr.ai_bi.ai_bi_platform.entity.KpiSnapshot snapshot = kpiSnapshotRepository
+                                .findBySnapshotDate(java.time.LocalDate.now())
+                                .orElse(new com.gpr.ai_bi.ai_bi_platform.entity.KpiSnapshot());
+
+                snapshot.setSnapshotDate(java.time.LocalDate.now());
+                snapshot.setTotalRevenue(totalRevenue);
+                snapshot.setTotalProfit(totalProfit);
+                snapshot.setActiveCustomers(activeCustomers);
+                snapshot.setTotalOrders(totalOrders);
+
+                kpiSnapshotRepository.save(snapshot);
         }
 }

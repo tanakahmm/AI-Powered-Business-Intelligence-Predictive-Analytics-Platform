@@ -68,6 +68,8 @@ public class ForecastService {
         return Map.of(
                 "predicted_sales", predictions,
                 "trend", actualTrend,
+                "confidence", "MEDIUM",
+                "assumption", "Based on historical sales variance and selected trend bias (" + trend + ")",
                 "message", "Generated from fallback (AI service unavailable - Smart Mock with " + trend + " bias)");
     }
 }

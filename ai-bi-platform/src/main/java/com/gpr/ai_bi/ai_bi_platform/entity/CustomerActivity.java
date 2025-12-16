@@ -20,10 +20,15 @@ public class CustomerActivity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long activityId;
 
-    @OneToOne
+    @jakarta.persistence.ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+    private String activityType; // LOGIN, ORDER, etc.
+    private String description;
+    private java.time.LocalDateTime activityDate;
+
+    // Legacy fields (optional, can be deprecated or used for snapshots)
     private LocalDate lastPurchaseDate;
     private Integer totalOrders;
     private BigDecimal totalSpent;
@@ -76,4 +81,29 @@ public class CustomerActivity {
     public void setComplaints(Integer complaints) {
         this.complaints = complaints;
     }
+
+    public String getActivityType() {
+        return activityType;
+    }
+
+    public void setActivityType(String activityType) {
+        this.activityType = activityType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public java.time.LocalDateTime getActivityDate() {
+        return activityDate;
+    }
+
+    public void setActivityDate(java.time.LocalDateTime activityDate) {
+        this.activityDate = activityDate;
+    }
+
 }

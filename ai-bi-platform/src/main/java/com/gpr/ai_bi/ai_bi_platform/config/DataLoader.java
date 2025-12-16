@@ -27,7 +27,7 @@ public class DataLoader implements CommandLineRunner {
 
         createIfNotFound("admin@aibi.com", "Admin User", "admin123", "ADMIN");
         createIfNotFound("manager@aibi.com", "Manager User", "manager123", "MANAGER");
-        createIfNotFound("shivani@gmail.com", "Shivani", "shivani123", "CUSTOMER");
+        createIfNotFound("prajith@gmail.com", "Prajith", "prajith", "CUSTOMER");
 
         System.out.println("✅ Default users verification finished.");
     }

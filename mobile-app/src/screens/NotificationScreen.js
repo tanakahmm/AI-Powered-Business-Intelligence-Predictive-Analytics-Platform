@@ -13,22 +13,11 @@ export default function NotificationScreen() {
     const loadData = async () => {
         try {
             const data = await getNotifications();
-            if (data && data.length > 0) {
+            if (data) {
                 setNotifications(data);
-            } else {
-                // Fallback Mock Data as per user request to not be empty
-                setNotifications([
-                    { notificationId: 101, message: "Welcome to NexusAI Enterprise!", type: "INFO", severity: "LOW", read: false },
-                    { notificationId: 102, message: "Your order #1234 has been processed.", type: "ORDER", severity: "MEDIUM", read: true },
-                    { notificationId: 103, message: "System maintenance scheduled for Sunday.", type: "SYSTEM", severity: "HIGH", read: false }
-                ]);
             }
         } catch (e) {
             console.error(e);
-            // Fallback on error too
-            setNotifications([
-                { notificationId: 999, message: "Failed to load real notifications. Showing cached/mock data.", type: "ERROR", severity: "HIGH", read: false }
-            ]);
         } finally {
             setLoading(false);
         }
@@ -57,6 +46,11 @@ export default function NotificationScreen() {
                         <Text style={styles.type}>{item.type} - {item.severity}</Text>
                     </TouchableOpacity>
                 )}
+                ListEmptyComponent={
+                    <View style={styles.center}>
+                        <Text style={{ fontSize: 18, color: '#888' }}>No notifications</Text>
+                    </View>
+                }
             />
         </View>
     );

@@ -2,19 +2,125 @@
 
 A comprehensive mobile business intelligence application with AI-powered predictive analytics, featuring customer churn prediction and sales forecasting.
 
+## 📂 Project Directory Structure
+
+```
+.
+├── ai-bi-platform/                                 # Spring Boot Backend
+│   ├── pom.xml                                     # Maven dependencies
+│   ├── src/main/resources/application.properties   # App configuration (DB, Server Port)
+│   ├── src/main/java/com/gpr/ai_bi/ai_bi_platform/
+│   │   ├── AiBiPlatformApplication.java            # Main Entry Point
+│   │   ├── config/                                 # Configuration
+│   │   │   ├── DataLoader.java                     # Initial Data Seeding
+│   │   │   ├── SecurityConfig.java                 # Spring Security Config
+│   │   │   └── RestTemplateConfig.java
+│   │   ├── controller/                             # REST API Controllers
+│   │   │   ├── AuthController.java                 # Login/Register
+│   │   │   ├── ChurnController.java                # Churn Prediction API
+│   │   │   ├── CustomerController.java             # Customer Management
+│   │   │   ├── DashboardController.java            # Dashboard Metrics
+│   │   │   ├── ForecastController.java             # Sales Forecasting
+│   │   │   ├── NotificationController.java
+│   │   │   ├── OrderController.java                # Order Placement/Retrieval
+│   │   │   ├── ProductController.java
+│   │   │   ├── ReportController.java
+│   │   │   ├── SalesController.java
+│   │   │   ├── StockController.java
+│   │   │   └── SupplierController.java
+│   │   ├── service/                                # Business Logic Layer
+│   │   │   ├── AuthService.java
+│   │   │   ├── ChurnService.java
+│   │   │   ├── CustomerService.java
+│   │   │   ├── DashboardService.java
+│   │   │   ├── ForecastService.java
+│   │   │   ├── NotificationService.java
+│   │   │   ├── OrderService.java
+│   │   │   ├── ProductService.java
+│   │   │   ├── ReportService.java
+│   │   │   ├── SalesService.java
+│   │   │   ├── StockService.java
+│   │   │   └── SupplierService.java
+│   │   ├── entity/                                 # Database Entities (JPA)
+│   │   │   ├── AppUser.java
+│   │   │   ├── ChurnPrediction.java
+│   │   │   ├── Customer.java
+│   │   │   ├── CustomerActivity.java
+│   │   │   ├── Notification.java
+│   │   │   ├── Order.java
+│   │   │   ├── OrderItem.java
+│   │   │   ├── Product.java
+│   │   │   ├── Report.java
+│   │   │   ├── Sale.java
+│   │   │   ├── SalesForecast.java
+│   │   │   ├── Stock.java
+│   │   │   └── Supplier.java
+│   │   ├── repository/                             # Data Access Layer
+│   │   │   └── [Entity]Repository.java             # (One per entity)
+│   │   └── dto/                                    # Data Transfer Objects
+│   │       ├── LoginRequest.java
+│   │       ├── LoginResponse.java
+│   │       ├── ProductRequest.java
+│   │       └── RegisterRequest.java
+│   └── ai_model/                                   # Python AI Microservice
+│       ├── app.py                                  # FastAPI Application
+│       ├── train.py                                # Model Training Script
+│       ├── requirements.txt                        # Python Dependencies
+│       ├── model/                                  # Trained Models
+│       │   ├── churn_model.pkl
+│       │   └── sales_forecast_model.pkl
+│       └── data/                                   # Training Data
+│           ├── churn_data.csv
+│           └── monthly_sales.csv
+│
+└── mobile-app/                                     # React Native Mobile App (Expo)
+    ├── App.js                                      # Entry Point
+    ├── app.json                                    # Expo Configuration
+    ├── package.json                                # NPM Dependencies
+    ├── src/
+    │   ├── services/
+    │   │   └── api.js                              # API Configuration & Calls
+    │   ├── navigation/
+    │   │   ├── AppNavigator.js                     # Main Stack Navigator
+    │   │   └── TabNavigator.js                     # Bottom Tab Navigator
+    │   ├── screens/                                # UI Screens
+    │   │   ├── LoginScreen.js
+    │   │   ├── SignupScreen.js
+    │   │   ├── HomeScreen.js                       # Dashboard
+    │   │   ├── ChurnScreen.js
+    │   │   ├── ForecastScreen.js
+    │   │   ├── OrderListScreen.js
+    │   │   ├── PlaceOrderScreen.js
+    │   │   ├── ProductFormScreen.js
+    │   │   ├── ReportScreen.js
+    │   │   ├── SalesScreen.js
+    │   │   ├── StockScreen.js
+    │   │   ├── StockEditScreen.js
+    │   │   ├── CustomerListScreen.js
+    │   │   ├── ProfileScreen.js
+    │   │   ├── NotificationScreen.js
+    │   │   ├── WelcomeScreen.js
+    │   │   └── SplashScreen.js
+    │   ├── component/                              # Reusable UI Components
+    │   │   └── card.js
+    │   └── data/
+    │       └── dummyData.js
+```
+
 ## 🏗️ Architecture
 
 The application consists of three main components:
 
-1. **Backend (Spring Boot)** - REST API server on port 8080
-2. **AI Microservice (Python/FastAPI)** - Machine learning models on port 8000
-3. **Mobile App (React Native/Expo)** - Cross-platform mobile application
+1. **Backend (Spring Boot)** - REST API server on port 8080.
+2. **AI Microservice (Python/FastAPI)** - Machine learning models on port 8000.
+3. **Mobile App (React Native/Expo)** - Cross-platform mobile application.
 
 ## 📋 Prerequisites
 
 ### Backend
 - Java 17 or higher
 - Maven 3.6+
+- (Optional) MySQL (Defaults to H2 in-memory DB)
 
 ### AI Microservice
 - Python 3.8+
@@ -23,7 +129,7 @@ The application consists of three main components:
 ### Mobile App
 - Node.js 18+ and npm
 - Expo CLI
-- iOS Simulator (Mac) or Android Emulator
+- Expo Go app on your physical device OR Android Emulator / iOS Simulator
 
 ## 🚀 Quick Start
 
@@ -34,185 +140,68 @@ cd ai-bi-platform
 ./mvnw clean install
 ./mvnw spring-boot:run
 ```
-
-The backend will start on `http://localhost:8080`
-
-**Verify it's running:**
-```bash
-curl http://localhost:8080/api/dashboard/summary
-```
+The backend will start on `http://localhost:8080`.
 
 ### 2. Start the AI Microservice (Python/FastAPI)
 
 ```bash
 cd ai-bi-platform/ai_model
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Start the server
 uvicorn app:app --reload --port 8000
 ```
-
-The AI service will start on `http://localhost:8000`
-
-**Verify it's running:**
-```bash
-curl http://localhost:8000/
-```
+The AI service will start on `http://localhost:8000`.
 
 ### 3. Start the Mobile App (Expo)
 
 ```bash
 cd mobile-app
-
-# Install dependencies (first time only)
 npm install
-
-# Start Expo dev server
 npx expo start
 ```
-
-Then:
-- Press `i` for iOS simulator
-- Press `a` for Android emulator
-- Scan QR code with Expo Go app on your phone
-
-## 📱 Using the Application
-
-1. **Splash Screen** - Auto-navigates to login after 2 seconds
-2. **Login Screen** - Demo login (no authentication required)
-3. **Dashboard** - View business metrics (revenue, profit, customers, growth)
-4. **Churn Prediction** - Predict customer churn risk
-5. **Sales Forecast** - View 3-month sales forecast
-
-## 🧪 Testing the APIs
-
-### Dashboard API
-```bash
-curl http://localhost:8080/api/dashboard/summary
-```
-
-Expected response:
-```json
-{
-  "revenue": "₹48,20,000",
-  "profit": "₹12,45,000",
-  "customers": 1920,
-  "growth": "21.4%"
-}
-```
-
-### Churn Prediction API
-```bash
-curl -X POST http://localhost:8080/api/churn/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "last_purchase_days_ago": 30,
-    "total_orders": 5,
-    "total_spent": 12000,
-    "complaints": 1
-  }'
-```
-
-### Sales Forecast API
-```bash
-curl "http://localhost:8080/api/forecast/predict?months=3"
-```
-
-## 🔧 Configuration
-
-### Backend Configuration
-
-Edit `ai-bi-platform/src/main/resources/application.properties`:
-
-- **Database**: Currently using H2 in-memory database. To use MySQL, uncomment the MySQL configuration and comment out H2 settings.
-- **Server Port**: Default is 8080
-- **CORS**: Enabled for all origins (configure for production)
-
-### Mobile App Configuration
-
-Edit `mobile-app/src/services/api.js`:
-
-- **BASE_URL**: Update if backend is not on localhost:8080
-- **TIMEOUT**: Request timeout in milliseconds (default: 10000)
-
-## 📁 Project Structure
-
-```
-.
-├── ai-bi-platform/              # Spring Boot backend
-│   ├── src/main/java/           # Java source code
-│   │   └── com/gpr/ai_bi/
-│   │       ├── controller/      # REST controllers
-│   │       ├── service/         # Business logic
-│   │       └── model/           # Data models
-│   ├── src/main/resources/      # Configuration files
-│   ├── ai_model/                # Python AI microservice
-│   │   ├── app.py              # FastAPI application
-│   │   ├── model/              # ML model files
-│   │   └── requirements.txt    # Python dependencies
-│   └── pom.xml                 # Maven configuration
-│
-└── mobile-app/                  # React Native mobile app
-    ├── src/
-    │   ├── screens/            # App screens
-    │   ├── component/          # Reusable components
-    │   ├── services/           # API services
-    │   └── navigation/         # Navigation config
-    ├── app.js                  # App entry point
-    └── package.json            # npm dependencies
-```
+- **Physical Device:** Scan the QR code with Expo Go.
+- **Emulator:** Press `a` (Android) or `i` (iOS).
 
 ## 🐛 Troubleshooting
 
+### "Network request timed out" or Login Error
+If you see `[TypeError: Network request timed out]` when logging in:
+
+1.  **Check IP Configuration:**
+    The mobile app cannot verify `localhost` if running on a physical device. It must point to your computer's local IP address.
+    
+    Verified IP for this setup: **`http://172.20.10.2:8080/api`**
+
+    Check `mobile-app/src/services/api.js`:
+    ```javascript
+    const BASE_URL = "http://172.20.10.2:8080/api"; 
+    ```
+    *Ensure your phone and computer are on the same Wi-Fi network.*
+
+2.  **Verify Backend is Running:**
+    Open `http://localhost:8080/api/dashboard/summary` in your computer's browser. You should see a JSON response.
+
+3.  **Check Firewall:**
+    Ensure your computer's firewall allows incoming connections on port 8080.
+
 ### Backend won't start
 - Check Java version: `java -version` (should be 17+)
-- Clean and rebuild: `./mvnw clean install`
-- Check port 8080 is not in use: `lsof -i :8080`
-
-### AI Microservice errors
-- Ensure Python 3.8+: `python --version`
-- Reinstall dependencies: `pip install -r requirements.txt`
-- Check port 8000 is available: `lsof -i :8000`
-- If models are missing, the service will still run but predictions will return 503 errors
+- Check port usage: `lsof -i :8080`
 
 ### Mobile App issues
 - Clear Expo cache: `npx expo start -c`
 - Reinstall dependencies: `rm -rf node_modules && npm install`
-- Check that backend and AI service are running
-- Verify API URLs in `src/services/api.js`
 
-### Network errors in mobile app
-- If using iOS simulator/Android emulator, use `http://localhost:8080`
-- If using physical device, replace `localhost` with your computer's IP address
-- Ensure all services are running and accessible
+## 🔧 API & Configuration
+
+### Backend (`application.properties`)
+- Port: `8080`
+- Database: H2 (default). To use MySQL, uncomment the MySQL lines in `src/main/resources/application.properties`.
+
+### Mobile App (`api.js`)
+- `BASE_URL`: API endpoint.
+    - Emulator: `http://10.0.2.2:8080/api` (Android) or `http://localhost:8080/api` (iOS)
+    - Physical Device: `http://<YOUR_LAN_IP>:8080/api`
 
 ## 🔐 Security Notes
-
-**For Production:**
-- Configure specific CORS origins instead of `*`
-- Add authentication and authorization
-- Use environment variables for sensitive configuration
-- Enable HTTPS
-- Secure database credentials
-- Implement rate limiting
-
-## 📝 Development Notes
-
-- The backend uses H2 in-memory database by default (data is lost on restart)
-- Dashboard data is currently mocked - replace with actual database queries
-- AI models need to be trained before predictions work (model files not included)
-- Mobile app uses demo authentication (no real login required)
-
-## 🎯 Next Steps
-
-1. Train and add ML model files to `ai-bi-platform/ai_model/model/`
-2. Set up MySQL database and populate with real data
-3. Implement proper authentication
-4. Add more analytics features
-5. Deploy to production environment
-
-## 📄 License
-
-This project is for educational and demonstration purposes.
+- The current setup allows all CORS origins (`*`) for development ease. For production, restrict this in `SecurityConfig.java`.
+- H2 Database data is lost on restart. Use MySQL for persistence.

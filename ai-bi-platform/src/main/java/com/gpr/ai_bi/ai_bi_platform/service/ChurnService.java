@@ -34,14 +34,21 @@ public class ChurnService {
                 probability = 0.95;
 
             String risk = "LOW";
-            if (probability > 0.4)
+            String action = "Keep engaging with standard offers.";
+
+            if (probability > 0.4) {
                 risk = "MEDIUM";
-            if (probability > 0.7)
+                action = "Send personalized discount coupon (10%).";
+            }
+            if (probability > 0.7) {
                 risk = "HIGH";
+                action = "Urgent: Assign account manager & offer 20% retention discount.";
+            }
 
             return Map.of(
                     "churn_probability", probability,
                     "risk_level", risk,
+                    "recommended_action", action,
                     "message", "Generated from fallback (AI service unavailable - Smart Mock)");
         }
     }

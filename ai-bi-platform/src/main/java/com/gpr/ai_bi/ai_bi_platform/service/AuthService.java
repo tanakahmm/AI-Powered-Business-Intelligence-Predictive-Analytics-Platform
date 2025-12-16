@@ -23,16 +23,19 @@ public class AuthService {
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final com.gpr.ai_bi.ai_bi_platform.repository.CustomerActivityRepository customerActivityRepository;
     private final AuthenticationManager authenticationManager;
 
     public AuthService(UserRepository userRepository, CustomerRepository customerRepository,
             PasswordEncoder passwordEncoder,
-            JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
+            JwtUtil jwtUtil, AuthenticationManager authenticationManager,
+            com.gpr.ai_bi.ai_bi_platform.repository.CustomerActivityRepository customerActivityRepository) {
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
+        this.customerActivityRepository = customerActivityRepository;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -50,6 +53,14 @@ public class AuthService {
 
         if (customer.isPresent()) {
             customerId = customer.get().getCustomerId();
+
+            // Log Activity
+            com.gpr.ai_bi.ai_bi_platform.entity.CustomerActivity activity = new com.gpr.ai_bi.ai_bi_platform.entity.CustomerActivity();
+            activity.setCustomer(customer.get());
+            activity.setActivityType("LOGIN");
+            activity.setDescription("User logged in successfully");
+            activity.setActivityDate(java.time.LocalDateTime.now());
+            customerActivityRepository.save(activity);
         }
 
         return new LoginResponse(token, user.getEmail(), user.getName(), user.getRole(), customerId);

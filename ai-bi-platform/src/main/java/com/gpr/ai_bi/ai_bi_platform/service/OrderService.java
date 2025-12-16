@@ -24,16 +24,19 @@ public class OrderService {
     private final NotificationService notificationService;
     private final SaleRepository saleRepository;
     private final com.gpr.ai_bi.ai_bi_platform.repository.CustomerRepository customerRepository;
+    private final com.gpr.ai_bi.ai_bi_platform.repository.CustomerActivityRepository customerActivityRepository;
 
     public OrderService(OrderRepository orderRepository, ProductRepository productRepository,
             StockRepository stockRepository, NotificationService notificationService, SaleRepository saleRepository,
-            com.gpr.ai_bi.ai_bi_platform.repository.CustomerRepository customerRepository) {
+            com.gpr.ai_bi.ai_bi_platform.repository.CustomerRepository customerRepository,
+            com.gpr.ai_bi.ai_bi_platform.repository.CustomerActivityRepository customerActivityRepository) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.stockRepository = stockRepository;
         this.notificationService = notificationService;
         this.saleRepository = saleRepository;
         this.customerRepository = customerRepository;
+        this.customerActivityRepository = customerActivityRepository;
     }
 
     @Transactional
@@ -76,6 +79,7 @@ public class OrderService {
             throw new RuntimeException("Order must contain at least one item.");
         }
 
+        // Link items to order and validate/update stock
         for (com.gpr.ai_bi.ai_bi_platform.entity.OrderItem item : order.getItems()) {
             // 1. Validate Product
             Product product = productRepository.findById(item.getProduct().getProductId())
@@ -83,7 +87,8 @@ public class OrderService {
 
             // 2. Check Stock
             Stock stock = stockRepository.findById(product.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Stock not found"));
+                    .orElseThrow(
+                            () -> new IllegalArgumentException("Stock not found for product: " + product.getName()));
 
             if (stock.getQuantity() < item.getQuantity()) {
                 throw new IllegalArgumentException(
@@ -104,7 +109,7 @@ public class OrderService {
 
             // Link item to order
             item.setOrder(order);
-            item.setProduct(product); // Ensure product is set correctly if only ID was passed
+            item.setProduct(product);
 
             // Calculate financials for this item
             BigDecimal cost = product.getCostPrice() != null ? product.getCostPrice() : BigDecimal.ZERO;
@@ -121,15 +126,33 @@ public class OrderService {
         // 5. Save Order
         order.setOrderDate(LocalDate.now());
         order.setStatus("Completed");
+        order.setTotalAmount(totalRevenue); // Ensure total amount is set
         Order savedOrder = orderRepository.save(order);
 
-        // 6. Record Sale (Aggregate)
+        // 6. Record Sale (Aggregate) - CRITICAL FOR KPI
         Sale sale = new Sale();
         sale.setSaleDate(LocalDate.now());
         sale.setRevenue(totalRevenue);
         sale.setProfit(totalProfit);
         if (order.getCustomer() != null) {
             sale.setRegion(order.getCustomer().getCity());
+
+            // Log Activity
+            try {
+                com.gpr.ai_bi.ai_bi_platform.entity.CustomerActivity activity = new com.gpr.ai_bi.ai_bi_platform.entity.CustomerActivity();
+                activity.setCustomer(order.getCustomer());
+                activity.setActivityType("ORDER_PLACED");
+                activity.setDescription("Order #" + savedOrder.getOrderId() + " placed for " + totalRevenue);
+                activity.setActivityDate(java.time.LocalDateTime.now());
+                customerActivityRepository.save(activity);
+            } catch (Exception e) {
+                // Log but don't fail transaction? Actually better to let it bubble if strict,
+                // but for logging soft fail is okay.
+                // However keeping it simple for now inside transaction.
+            }
+
+        } else {
+            sale.setRegion("Unknown");
         }
         saleRepository.save(sale);
 

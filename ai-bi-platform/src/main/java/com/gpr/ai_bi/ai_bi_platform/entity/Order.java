@@ -31,6 +31,7 @@ public class Order {
     private List<OrderItem> items;
     private LocalDate orderDate;
     private String status;
+    private java.math.BigDecimal totalAmount;
 
     public Long getOrderId() {
         return orderId;
@@ -70,5 +71,13 @@ public class Order {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public java.math.BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(java.math.BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }
