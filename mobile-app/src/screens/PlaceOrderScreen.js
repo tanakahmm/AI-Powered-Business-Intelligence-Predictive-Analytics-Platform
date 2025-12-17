@@ -35,9 +35,12 @@ export default function PlaceOrderScreen({ navigation }) {
         setLoading(true);
         try {
             const orderData = {
-                // Backend knows the customer from the Auth Token
-                product: { productId: parseInt(productId) },
-                quantity: parseInt(quantity)
+                items: [
+                    {
+                        product: { productId: parseInt(productId) },
+                        quantity: parseInt(quantity)
+                    }
+                ]
             };
 
             await placeOrder(orderData);

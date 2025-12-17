@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator, Sa
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define API URL - reuse logic from services/api.js would be better, but keeping it simple for now or import it
-const LOGIN_URL = "http://192.168.1.4:8080/api/auth/login";
+import { login } from "../services/api";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("admin@aibi.com"); // Pre-fill for easier testing
@@ -18,19 +18,7 @@ export default function LoginScreen({ navigation }) {
 
     setLoading(true);
     try {
-      const response = await fetch(LOGIN_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
+      const data = await login(email, password);
 
       await AsyncStorage.setItem('userToken', data.token);
       await AsyncStorage.setItem('userInfo', JSON.stringify({

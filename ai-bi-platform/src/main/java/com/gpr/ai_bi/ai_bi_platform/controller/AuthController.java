@@ -29,7 +29,7 @@ public class AuthController {
             LoginResponse response = authService.login(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new LoginResponse("Login failed: " + e.getMessage()));
         }
     }
 
@@ -39,7 +39,7 @@ public class AuthController {
             LoginResponse response = authService.register(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new LoginResponse("Registration failed: " + e.getMessage()));
         }
     }
 }

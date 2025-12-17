@@ -10,4 +10,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     java.util.List<Order> findByCustomer_CustomerId(Long customerId);
 
     java.util.List<Order> findByCustomer_Email(String email);
+
+    java.util.List<Order> findTop5ByOrderByOrderDateDesc();
 }

@@ -63,7 +63,7 @@ public class AuthService {
             customerActivityRepository.save(activity);
         }
 
-        return new LoginResponse(token, user.getEmail(), user.getName(), user.getRole(), customerId);
+        return new LoginResponse(token, user.getName(), user.getEmail(), user.getRole(), customerId);
     }
 
     public LoginResponse register(RegisterRequest request) {
@@ -89,9 +89,17 @@ public class AuthService {
             customer.setCreatedDate(LocalDate.now());
             customer.setStatus("Active");
             // Defaults
-            customer.setCity("Unknown");
-            customer.setState("Unknown");
-            customer.setPhone("0000000000");
+            customer.setCity(request.getCity() != null && !request.getCity().isEmpty() ? request.getCity() : "Unknown");
+            customer.setState(
+                    request.getState() != null && !request.getState().isEmpty() ? request.getState() : "Unknown");
+            customer.setPhone(
+                    request.getPhone() != null && !request.getPhone().isEmpty() ? request.getPhone() : "0000000000");
+            // Defaults
+            customer.setCity(request.getCity() != null && !request.getCity().isEmpty() ? request.getCity() : "Unknown");
+            customer.setState(
+                    request.getState() != null && !request.getState().isEmpty() ? request.getState() : "Unknown");
+            customer.setPhone(
+                    request.getPhone() != null && !request.getPhone().isEmpty() ? request.getPhone() : "0000000000");
 
             customerRepository.save(customer);
             customerId = customer.getCustomerId();

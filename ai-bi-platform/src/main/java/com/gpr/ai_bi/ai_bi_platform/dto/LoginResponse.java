@@ -7,8 +7,13 @@ public class LoginResponse {
     private String role;
 
     private Long customerId;
+    private String message;
 
     public LoginResponse() {
+    }
+
+    public LoginResponse(String message) {
+        this.message = message;
     }
 
     public LoginResponse(String token, String name, String email, String role, Long customerId) {
@@ -57,5 +62,13 @@ public class LoginResponse {
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

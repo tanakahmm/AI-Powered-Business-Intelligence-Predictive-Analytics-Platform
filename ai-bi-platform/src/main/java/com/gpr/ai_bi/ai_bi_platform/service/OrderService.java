@@ -2,10 +2,8 @@ package com.gpr.ai_bi.ai_bi_platform.service;
 
 import com.gpr.ai_bi.ai_bi_platform.entity.Order;
 import com.gpr.ai_bi.ai_bi_platform.entity.Product;
-import com.gpr.ai_bi.ai_bi_platform.entity.Stock;
 import com.gpr.ai_bi.ai_bi_platform.repository.OrderRepository;
 import com.gpr.ai_bi.ai_bi_platform.repository.ProductRepository;
-import com.gpr.ai_bi.ai_bi_platform.repository.StockRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,20 +18,18 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private final StockRepository stockRepository;
-    private final NotificationService notificationService;
+    private final StockService stockService;
     private final SaleRepository saleRepository;
     private final com.gpr.ai_bi.ai_bi_platform.repository.CustomerRepository customerRepository;
     private final com.gpr.ai_bi.ai_bi_platform.repository.CustomerActivityRepository customerActivityRepository;
 
     public OrderService(OrderRepository orderRepository, ProductRepository productRepository,
-            StockRepository stockRepository, NotificationService notificationService, SaleRepository saleRepository,
+            StockService stockService, SaleRepository saleRepository,
             com.gpr.ai_bi.ai_bi_platform.repository.CustomerRepository customerRepository,
             com.gpr.ai_bi.ai_bi_platform.repository.CustomerActivityRepository customerActivityRepository) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
-        this.stockRepository = stockRepository;
-        this.notificationService = notificationService;
+        this.stockService = stockService;
         this.saleRepository = saleRepository;
         this.customerRepository = customerRepository;
         this.customerActivityRepository = customerActivityRepository;
@@ -76,8 +72,10 @@ public class OrderService {
 
         // Items should be provided in the order object
         if (order.getItems() == null || order.getItems().isEmpty()) {
-            throw new RuntimeException("Order must contain at least one item.");
+            System.out.println("OrderService: Order items are empty or null");
+            throw new IllegalArgumentException("Order must contain at least one item.");
         }
+        System.out.println("OrderService: Processing " + order.getItems().size() + " items");
 
         // Link items to order and validate/update stock
         for (com.gpr.ai_bi.ai_bi_platform.entity.OrderItem item : order.getItems()) {
@@ -85,27 +83,8 @@ public class OrderService {
             Product product = productRepository.findById(item.getProduct().getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-            // 2. Check Stock
-            Stock stock = stockRepository.findById(product.getProductId())
-                    .orElseThrow(
-                            () -> new IllegalArgumentException("Stock not found for product: " + product.getName()));
-
-            if (stock.getQuantity() < item.getQuantity()) {
-                throw new IllegalArgumentException(
-                        "Insufficient stock for product " + product.getName() + ". Available: " + stock.getQuantity());
-            }
-
-            // 3. Deduct Stock
-            stock.setQuantity(stock.getQuantity() - item.getQuantity());
-            stockRepository.save(stock);
-
-            // 4. Check Reorder Level
-            if (stock.getQuantity() <= stock.getReorderLevel()) {
-                notificationService.createNotification(
-                        "STOCK",
-                        "Low Stock Alert: " + product.getName() + " is below reorder level.",
-                        "HIGH");
-            }
+            // 2. Reduce Stock (Delegate to StockService)
+            stockService.reduceStock(product.getProductId(), item.getQuantity());
 
             // Link item to order
             item.setOrder(order);

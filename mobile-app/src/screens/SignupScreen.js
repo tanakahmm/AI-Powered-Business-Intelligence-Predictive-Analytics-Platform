@@ -13,13 +13,16 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Define API URL
-const REGISTER_URL = "http://192.168.1.4:8080/api/auth/register";
+import { register } from "../services/api";
 
 export default function SignupScreen({ navigation }) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("CUSTOMER");
+    const [phone, setPhone] = useState("");
+    const [city, setCity] = useState("");
+    const [state, setState] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleSignup = async () => {
@@ -30,21 +33,10 @@ export default function SignupScreen({ navigation }) {
 
         setLoading(true);
         try {
-            const response = await fetch(REGISTER_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ name, email, password, role }),
-            });
+            // Use the API service instead of direct fetch
+            const data = await register(name, email, password, role, phone, city, state);
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Registration failed");
-            }
-
-            // Auto login on successful registration
+            // Auto login logic handled or just proceed
             await AsyncStorage.setItem("userToken", data.token);
             await AsyncStorage.setItem(
                 "userInfo",
@@ -102,6 +94,41 @@ export default function SignupScreen({ navigation }) {
                     secureTextEntry
                 />
             </View>
+
+            {role === "CUSTOMER" && (
+                <>
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.label}>Phone Number</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter phone number"
+                            value={phone}
+                            onChangeText={setPhone}
+                            keyboardType="phone-pad"
+                        />
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.label}>City</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter city"
+                            value={city}
+                            onChangeText={setCity}
+                        />
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.label}>State</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter state"
+                            value={state}
+                            onChangeText={setState}
+                        />
+                    </View>
+                </>
+            )}
 
             {loading ? (
                 <ActivityIndicator size="large" color="#007AFF" />

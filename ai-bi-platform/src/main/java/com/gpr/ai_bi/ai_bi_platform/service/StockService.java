@@ -46,6 +46,24 @@ public class StockService {
         return savedStock;
     }
 
+    @Transactional
+    public void reduceStock(Long productId, Integer quantityToReduce) {
+        Stock stock = stockRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Stock not found for product id: " + productId));
+
+        if (stock.getQuantity() < quantityToReduce) {
+            Optional<Product> product = productRepository.findById(productId);
+            String productName = product.map(Product::getName).orElse("Unknown Product");
+            throw new IllegalArgumentException(
+                    "Insufficient stock for product " + productName + ". Available: " + stock.getQuantity());
+        }
+
+        stock.setQuantity(stock.getQuantity() - quantityToReduce);
+        Stock savedStock = stockRepository.save(stock);
+
+        checkLowStock(savedStock);
+    }
+
     private void checkLowStock(Stock stock) {
         if (stock.getQuantity() <= stock.getReorderLevel()) {
             Optional<Product> product = productRepository.findById(stock.getProductId());

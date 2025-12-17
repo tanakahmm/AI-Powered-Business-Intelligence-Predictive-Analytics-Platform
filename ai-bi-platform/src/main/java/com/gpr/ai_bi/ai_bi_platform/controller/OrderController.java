@@ -41,7 +41,15 @@ public class OrderController {
     }
 
     @PostMapping("/placeOrder")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public Order placeOrder(@RequestBody Order order) {
+        System.out.println("OrderController: Received order payload");
+        if (order.getItems() != null) {
+            System.out.println("OrderController: Items count: " + order.getItems().size());
+        } else {
+            System.out.println("OrderController: Items list is NULL");
+        }
+
         org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
                 .getContext().getAuthentication();
         return orderService.placeOrder(order, auth.getName());

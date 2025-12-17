@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // For Android Emulator use "http://10.0.2.2:8080/api"
 // For iOS Simulator use "http://localhost:8080/api"
 // For Physical Device use your LAN IP e.g. "http://192.168.1.X:8080/api"
-const BASE_URL = "http://172.20.10.2:8080/api";
+const BASE_URL = "http://localhost:8080/api";
 
 const TIMEOUT = 10000; // 10 seconds
 
@@ -48,6 +48,32 @@ const fetchWithTimeout = async (url, options = {}) => {
     if (error.name === 'AbortError') {
       throw new Error('Request timeout - please check your connection');
     }
+    throw error;
+  }
+};
+
+export const login = async (email, password) => {
+  try {
+    return await fetchWithTimeout(`${BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+  } catch (error) {
+    console.error("Login API Error:", error);
+    throw error;
+  }
+};
+
+export const register = async (name, email, password, role, phone, city, state) => {
+  try {
+    return await fetchWithTimeout(`${BASE_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password, role, phone, city, state })
+    });
+  } catch (error) {
+    console.error("Register API Error:", error);
     throw error;
   }
 };

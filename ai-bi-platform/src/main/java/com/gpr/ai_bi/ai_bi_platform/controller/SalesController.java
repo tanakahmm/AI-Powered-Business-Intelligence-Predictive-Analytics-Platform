@@ -19,6 +19,7 @@ public class SalesController {
     }
 
     @GetMapping("/history")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public List<Sale> getSalesHistory() {
         return salesService.getAllSales();
     }
@@ -29,6 +30,7 @@ public class SalesController {
     }
 
     @PostMapping
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public Sale createSale(@RequestBody Sale sale) {
         return salesService.createSale(sale);
     }

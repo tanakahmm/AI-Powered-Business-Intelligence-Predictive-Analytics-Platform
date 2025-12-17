@@ -21,7 +21,14 @@ public class DashboardController {
 
     @GetMapping("/summary")
     public Map<String, Object> getSummary() {
-        return dashboardService.getDashboardSummary();
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        String role = auth.getAuthorities().stream()
+                .findFirst()
+                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                .orElse("ROLE_CUSTOMER");
+
+        return dashboardService.getDashboardSummary(auth.getName(), role);
     }
 
     @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
