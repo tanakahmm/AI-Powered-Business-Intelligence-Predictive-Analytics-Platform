@@ -3,7 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // For Android Emulator use "http://10.0.2.2:8080/api"
 // For iOS Simulator use "http://localhost:8080/api"
 // For Physical Device use your LAN IP e.g. "http://192.168.1.X:8080/api"
-const BASE_URL = "http://localhost:8080/api";
+import { Platform } from 'react-native';
+
+// For Android Emulator use "http://10.0.2.2:8080/api"
+// For iOS Simulator use "http://localhost:8080/api"
+// For Physical Device use your LAN IP e.g. "http://192.168.1.X:8080/api"
+const BASE_URL = Platform.OS === 'android' ? "http://10.0.2.2:8080/api" : "http://localhost:8080/api";
 
 const TIMEOUT = 10000; // 10 seconds
 
@@ -36,10 +41,19 @@ const fetchWithTimeout = async (url, options = {}) => {
     clearTimeout(timeout);
 
     if (!response.ok) {
+      const errorData = await response.text();
+      console.error(`[API Error] Status: ${response.status}, Body: ${errorData}`);
+
       if (response.status === 403) {
         console.error("Access Forbidden: Token might be invalid or missing.");
       }
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // Try to parse JSON if possible for better error message
+      try {
+        const jsonError = JSON.parse(errorData);
+        throw new Error(jsonError.message || `HTTP error! status: ${response.status}`);
+      } catch (e) {
+        throw new Error(`HTTP error! status: ${response.status} - ${errorData}`);
+      }
     }
 
     return response.json();
